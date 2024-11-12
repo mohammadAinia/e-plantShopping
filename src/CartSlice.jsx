@@ -11,23 +11,24 @@ const cartSlice = createSlice({
   reducers: {
     // Add item to the cart
     addItem: (state, action) => {
-      const newItem = action.payload;
-      // Check if the item is already in the cart
-      const existingItem = state.cartItems.find(item => item.name === newItem.name);
-      if (existingItem) {
-        // If item exists, update its quantity
-        existingItem.quantity += newItem.quantity;
+      const itemExists = state.cartItems.find(item => item.name === action.payload.name);
+      if (itemExists) {
+        // Item exists, increase the quantity
+        itemExists.quantity += 1;
       } else {
-        // If item does not exist, add it to the cart
-        state.cartItems.push(newItem);
+        // Item does not exist, add with quantity set to 1
+        state.cartItems.push({ ...action.payload, quantity: 1 });
       }
     },
     
+    
     // Remove item from the cart
     removeItem: (state, action) => {
-      const itemName = action.payload;
-      state.cartItems = state.cartItems.filter(item => item.name !== itemName);
-    },
+      const index = state.cartItems.findIndex(item => item.name === action.payload.name);
+      if (index !== -1) {
+          state.cartItems.splice(index, 1); // Remove the item from the cart
+      }
+  },
     
     // Update quantity of an item
     updateQuantity: (state, action) => {
@@ -43,7 +44,11 @@ const cartSlice = createSlice({
 // Export action creators
 export const { addItem, removeItem, updateQuantity } = cartSlice.actions;
 export const selectTotalQuantity = (state) => {
-    return state.cart.cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
+  console.log("Cart Items:", state.cart.cartItems); // Log cart items
+  return state.cart.cartItems.reduce((total, item) => {
+    console.log("Item quantity:", item.quantity); // Log each item's quantity
+    return total + item.quantity;
+  }, 0);
+};
 // Export reducer to be used in store.js
 export default cartSlice.reducer;
