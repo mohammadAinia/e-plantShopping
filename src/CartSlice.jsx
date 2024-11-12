@@ -1,31 +1,47 @@
-// CartSlice.js
+// CartSlice.jsx
 import { createSlice } from '@reduxjs/toolkit';
 
-export const CartSlice = createSlice({
+const initialState = {
+  cartItems: [],
+};
+
+const cartSlice = createSlice({
   name: 'cart',
-  initialState: {
-    items: [], // Initialize items as an empty array
-  },
+  initialState,
   reducers: {
+    // Add item to the cart
     addItem: (state, action) => {
-      // Check if the plant already exists in the cart
-      const existingItem = state.items.find(item => item.name === action.payload.name);
-      if (!existingItem) {
-        state.items.push(action.payload); // Add the new plant to the cart
+      const newItem = action.payload;
+      // Check if the item is already in the cart
+      const existingItem = state.cartItems.find(item => item.name === newItem.name);
+      if (existingItem) {
+        // If item exists, update its quantity
+        existingItem.quantity += newItem.quantity;
+      } else {
+        // If item does not exist, add it to the cart
+        state.cartItems.push(newItem);
       }
     },
+    
+    // Remove item from the cart
     removeItem: (state, action) => {
-      state.items = state.items.filter(item => item.name !== action.payload.name);
+      const itemName = action.payload;
+      state.cartItems = state.cartItems.filter(item => item.name !== itemName);
     },
+    
+    // Update quantity of an item
     updateQuantity: (state, action) => {
-      // Example code for handling quantity if needed
-      const item = state.items.find(item => item.name === action.payload.name);
+      const { name, quantity } = action.payload;
+      const item = state.cartItems.find(item => item.name === name);
       if (item) {
-        item.quantity = action.payload.quantity;
+        item.quantity = quantity;
       }
-    },
-  },
+    }
+  }
 });
 
-export const { addItem, removeItem, updateQuantity } = CartSlice.actions;
-export default CartSlice.reducer;
+// Export action creators
+export const { addItem, removeItem, updateQuantity } = cartSlice.actions;
+
+// Export reducer to be used in store.js
+export default cartSlice.reducer;
